@@ -59,3 +59,15 @@ footer{min-height:180px;display:grid;grid-template-columns:1fr 1fr 1fr;align-ite
   .form-footer{align-items:stretch;flex-direction:column}
   .contact-form .button{width:100%}
 }
+
+
+/* Dedicated contact page */
+.contact-cta{text-align:center}
+.contact-cta h2{font-size:clamp(2.3rem,5vw,5.2rem);line-height:.98;letter-spacing:-.055em;margin:18px auto 24px}
+.contact-cta>div>p:not(.eyebrow){max-width:690px;margin:0 auto 30px;font-size:1.05rem;line-height:1.7}
+.contact-page .nav{position:relative;z-index:2}
+.contact-page-section{min-height:calc(100vh - 190px);padding-top:72px}
+.contact-page nav a[aria-current="page"]{color:#39e0db}
+@media(max-width:620px){
+  .contact-page-section{padding-top:52px}
+}

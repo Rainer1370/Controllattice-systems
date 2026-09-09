@@ -15,8 +15,9 @@ knowledge for complex scientific and industrial systems.
 
 ## Website
 
-- Production preview: <https://controllattice-systems.rainer1370.chatgpt.site>
-- Custom domain: <https://controllattice.com> (DNS activation in progress)
+- Production: <https://controllattice.com>
+- Site source: `app/`
+- Static compatibility pages: repository root HTML files
 - Engineering portfolio: <https://rainer1370.com>
 
 ## Local development
@@ -38,10 +39,11 @@ npm run build
 
 ## Project structure
 
-- `app/page.tsx` — page content and structure
+- `app/page.tsx` — scientific-facilities homepage
+- `app/products/`, `app/work/`, `app/ai/`, `app/about/`, `app/staff/`, `app/contact/` — site routes
 - `app/globals.css` — visual system and responsive layout
 - `app/layout.tsx` — metadata and document shell
-- `public/favicon.svg` — ControlLattice mark
+- `public/brand/` and `public/*.png` — brand and technical imagery
 
 ## Ownership
 

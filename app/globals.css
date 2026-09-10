@@ -950,7 +950,14 @@ footer p span {
     justify-content: flex-start;
   }
 
+  .hero-person picture {
+    display: block;
+    width: 100%;
+    height: 520px;
+  }
+
   .hero-person img {
+    display: block;
     height: 520px;
     object-fit: contain;
     object-position: center top;
@@ -969,6 +976,7 @@ footer p span {
   }
 
   .hero-person img {
+    display: block;
     object-fit: cover;
     object-position: 48% 28%;
   }

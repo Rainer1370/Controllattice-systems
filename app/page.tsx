@@ -19,7 +19,7 @@ const industries = [
 export default function Home() { return <main className="science-theme">
   <SiteHeader active="home" />
   <section className="science-hero"><div className="science-hero-bg"/><div className="shell science-hero-grid">
-    <aside className="hero-person"><img src="/brand/rob-control-room.png" alt="Rob Rainer in a scientific controls environment"/><div className="person-label"><strong>ROB RAINER</strong><span>Managing Director &amp; Principal Engineer</span></div></aside>
+    <aside className="hero-person"><picture><source media="(min-width: 761px)" srcSet="/brand/rob-control-room-vertical.svg"/><img src="/brand/rob-control-room.png" alt="Rob Rainer in a scientific controls environment"/></picture><div className="person-label"><strong>ROB RAINER</strong><span>Managing Director &amp; Principal Engineer</span></div></aside>
     <div className="hero-copy"><p className="eyebrow"><i/> Science · Industry · Infrastructure</p><h1>Advanced Control Systems<br/>for a More Capable World.</h1><p className="lede">Engineering, AI, and automation for scientific facilities, critical infrastructure, and complex industrial systems.</p><div className="actions"><a className="button" href="/products">Our solutions →</a><a className="button ghost" href="/work">Technical briefs →</a></div><div className="signal"><span>CONTROLS</span><b/><span>DIAGNOSTICS</span><b/><span>DATA</span><b/><span>INSIGHT</span></div></div>
   </div></section>
   <section className="capability-strip"><div className="shell capability-grid">{capabilities.map(c=><article key={c[0]}><b>{c[0]}</b><div><h3>{c[1]}</h3><p>{c[2]}</p></div></article>)}</div></section>

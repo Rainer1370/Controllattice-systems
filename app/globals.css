@@ -944,12 +944,16 @@ footer p span {
   }
 }
 
-/* Preserve the complete portrait on desktop; retain the approved mobile crop. */
+/* Fill the desktop portrait rail from the top without cropping the photo. */
 @media (min-width: 761px) {
+  .hero-person {
+    justify-content: flex-start;
+  }
+
   .hero-person img {
-    height: 430px;
+    height: 520px;
     object-fit: contain;
-    object-position: center bottom;
+    object-position: center top;
   }
 }
 
@@ -960,6 +964,10 @@ footer p span {
 }
 
 @media (max-width: 760px) {
+  .hero-person {
+    justify-content: flex-end;
+  }
+
   .hero-person img {
     object-fit: cover;
     object-position: 48% 28%;

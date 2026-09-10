@@ -943,3 +943,25 @@ footer p span {
     font-size: 31px;
   }
 }
+
+/* Preserve the complete portrait on desktop; retain the approved mobile crop. */
+@media (min-width: 761px) {
+  .hero-person img {
+    height: 430px;
+    object-fit: contain;
+    object-position: center bottom;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1120px) {
+  .science-hero-grid {
+    grid-template-columns: 260px 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .hero-person img {
+    object-fit: cover;
+    object-position: 48% 28%;
+  }
+}

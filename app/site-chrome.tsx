@@ -5,14 +5,14 @@ export function Brand() { return <span className="brand"><Mark/><span><strong>CO
 
 const links: { key: Page; label: string; href: string }[] = [
   { key: "home", label: "Home", href: "/" },
-  { key: "products", label: "Solutions", href: "/products" },
-  { key: "work", label: "Technical Briefs", href: "/work" },
-  { key: "ai", label: "Practical AI", href: "/ai" },
+  { key: "products", label: "Services & Products", href: "/products" },
+  { key: "work", label: "Work", href: "/work" },
+  { key: "ai", label: "AI & Knowledge", href: "/ai" },
   { key: "about", label: "About", href: "/about" },
   { key: "staff", label: "Staff", href: "/staff" },
   { key: "contact", label: "Contact", href: "/contact" },
 ];
 
 export function SiteHeader({ active }: { active: Page }) { return <header className="nav shell"><Link href="/" aria-label="Control Lattice Systems home"><Brand/></Link><nav aria-label="Primary navigation">{links.map(link => <Link key={link.key} href={link.href} aria-current={active === link.key ? "page" : undefined}>{link.label}</Link>)}</nav>{active !== "contact" && <Link className="button small" href="/contact">Start a conversation</Link>}</header>; }
-export function SiteFooter() { return <footer className="shell"><Link href="/" aria-label="Control Lattice Systems home"><Brand/></Link><p>Controls · Diagnostics · Digital Twins · AI · Infrastructure<br/><span>Engineering complexity. Enabling discovery.</span></p><p>© 2026 Control Lattice Systems</p></footer>; }
+export function SiteFooter() { return <footer className="shell"><Link href="/" aria-label="Control Lattice Systems home"><Brand/></Link><p>Engineering · Intelligence · Creation · Contribution<br/><span>Making complex systems and knowledge work better.</span></p><p>© 2026 Control Lattice Systems</p></footer>; }
 import Link from "next/link";

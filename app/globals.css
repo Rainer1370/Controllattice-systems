@@ -981,3 +981,81 @@ footer p span {
     object-position: 48% 28%;
   }
 }
+
+
+/* 2026 expanded brand: engineering, intelligence, creation and contribution. */
+.science-hero-grid {
+  grid-template-columns: minmax(270px, 320px) minmax(0, 1fr);
+  gap: clamp(42px, 6vw, 84px);
+  align-items: center;
+  min-height: 620px;
+}
+.hero-person {
+  align-self: center;
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(155deg, #39e0db52, #071923 42%, #d7b46b4d);
+  border: 1px solid #7edfe45c;
+  box-shadow: 0 30px 80px #0008;
+}
+.hero-person img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 850 / 934;
+  object-fit: contain;
+  object-position: center;
+  background: #071923;
+  border: 0;
+  mask-image: none;
+}
+.person-label {
+  left: 28px;
+  right: 10px;
+  bottom: 28px;
+  padding: 16px 14px 14px 18px;
+  border-left: 4px solid #078cf2;
+  background: linear-gradient(90deg, #04141aef, #04141a30);
+}
+.person-label strong { font-size: 14px; letter-spacing: .1em; }
+.hero-copy { padding: 82px 0; max-width: 800px; }
+.science-hero h1 { font-size: clamp(46px, 5vw, 72px); }
+.science-hero .lede { max-width: 760px; font-size: clamp(18px, 1.75vw, 24px); line-height: 1.5; }
+.capability-grid { grid-template-columns: repeat(4, 1fr); }
+.capability-grid article { padding: 30px 24px; min-height: 166px; }
+.capability-grid h3 { font-size: 16px; margin-bottom: 9px; }
+.capability-grid p { line-height: 1.55; }
+.now-band {
+  padding: 90px 0;
+  background: radial-gradient(circle at 12% 18%, #42d8e51f, transparent 28%), #061924;
+  border-bottom: 1px solid #244651;
+}
+.now-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.now-grid article {
+  min-height: 235px;
+  padding: 34px 30px;
+  background: linear-gradient(145deg, #0c2c39, #071b25);
+  border: 1px solid #28505e;
+  border-top: 3px solid #39e0db;
+}
+.now-grid article:nth-child(2) { border-top-color: #d7b46b; }
+.now-grid small { color: #6ee9ef; font-size: 10px; font-weight: 800; letter-spacing: .16em; }
+.now-grid h3 { font-size: 25px; letter-spacing: -.03em; margin: 24px 0 12px; }
+.now-grid p { color: #aac1c8; line-height: 1.7; margin: 0; }
+.now-actions { display: flex; align-items: center; gap: 30px; margin-top: 30px; }
+
+@media (min-width: 761px) and (max-width: 1120px) {
+  .science-hero-grid { grid-template-columns: minmax(230px, 280px) minmax(0, 1fr); gap: 40px; }
+}
+@media (max-width: 760px) {
+  .science-hero-grid { grid-template-columns: 1fr; gap: 0; padding-bottom: 34px; }
+  .hero-person { order: 2; width: min(100%, 360px); height: auto; margin: 20px 0 0; }
+  .hero-person img { width: 100%; height: auto; object-fit: contain; object-position: center; }
+  .person-label { left: 24px; bottom: 24px; }
+  .science-hero h1 { font-size: clamp(40px, 11.5vw, 54px); }
+  .science-hero .signal { margin-top: 46px; flex-wrap: wrap; }
+  .capability-grid, .now-grid { grid-template-columns: 1fr; }
+  .capability-grid article { min-height: 0; padding: 25px 18px; }
+  .now-band { padding: 72px 0; }
+  .now-actions { align-items: flex-start; flex-direction: column; }
+}

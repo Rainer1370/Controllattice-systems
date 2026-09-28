@@ -14,6 +14,7 @@ const serviceDetails: Record<string, { title: string; interest: string; summary:
   "twin-discovery": { title: "Twin Discovery", interest: "Digital twin package", summary: "A focused system assessment, use-case definition, signal map, architecture, and phased implementation plan.", message: "I’m interested in a Twin Discovery engagement. I’d like to discuss the system, the decisions the twin should support, available data and interfaces, and the desired implementation path." },
   "twin-prototype": { title: "Working Prototype", interest: "Digital twin package", summary: "A functioning simulation with representative behavior, operator visualization, documented assumptions, and an acceptance demonstration.", message: "I’m interested in a Working Digital Twin Prototype. I’d like to discuss the required behavior, fidelity, interfaces, visualization, and acceptance demonstration." },
   "twin-operational": { title: "Operational Integration", interest: "Digital twin package", summary: "A production-scoped twin connected to real interfaces, test workflows, monitoring, documentation, and team handoff.", message: "I’m interested in Operational Digital Twin Integration. I’d like to discuss the production interfaces, fidelity, test workflows, monitoring, documentation, and lifecycle support required." },
+  "observability-review": { title: "Machine Observability Review", interest: "Machine Observability Review", summary: "A focused remote assessment of alarms, interlocks, command and readback evidence, event sequencing, operator displays, log retention, and restart procedures, followed by a prioritized written improvement report and findings meeting.", message: "I’m interested in a Machine Observability Review. I’d like to discuss the system, recurring failure or troubleshooting problems, available controls and log data, and the people who operate and maintain it." },
 };
 
 export default function Contact() {
@@ -151,6 +152,7 @@ export default function Contact() {
                   <option>Technical modernization</option>
                   <option>Managed technical systems</option>
                   <option>Engineering Knowledge Audit</option>
+                  <option>Machine Observability Review</option>
                   <option>Source Stability Observer</option>
                   <option>Digital twin package</option>
                   <option>Portfolio website</option>

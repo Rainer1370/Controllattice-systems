@@ -6,7 +6,7 @@ import {
 } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
 
-import { exchange, type ExchangeEnv } from "./exchange";
+import { exchange, deliverModerationNotifications, type ExchangeEnv } from "./exchange";
 
 interface Env extends ExchangeEnv {
   ASSETS: Fetcher;
@@ -43,8 +43,12 @@ const worker = {
     if (
       url.pathname === "/api/exchange" ||
       url.pathname.startsWith("/api/exchange/")
-    )
-      return exchange(request, env);
+    ) {
+      const response = await exchange(request, env);
+      if (response.ok && request.method === "POST" && /\/(threads|replies)$/.test(url.pathname))
+        ctx.waitUntil(deliverModerationNotifications(env));
+      return response;
+    }
 
     if (
       url.pathname === "/service-desk-demo" ||

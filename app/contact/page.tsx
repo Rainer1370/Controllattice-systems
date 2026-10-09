@@ -84,18 +84,18 @@ export default function Contact() {
         <div className="shell contact-grid">
           <div className="contact-intro">
             <p className="eyebrow">
-              <i /> Start with the system
+              <i /> Ideas · Collaboration · Engineering
             </p>
             <h1>
-              What is getting lost between your equipment, data, and people?
+              Let’s start a conversation.
             </h1>
             <p>
-              Tell us what you are operating, where the friction is, and what a
-              better outcome would look like. We will respond from{" "}
+              Have a technical challenge, a research idea, or just something worth discussing? We welcome engineers, researchers, students, organizations, and curious people. You don’t need a finished project or a purchasing decision to get in touch. We’ll reply from{" "}
               <strong>contact@controllattice.com</strong>.
             </p>
           </div>
           <form className="contact-form" onSubmit={submit} noValidate>
+            <p>Want to discuss something publicly? Visit <a href="/discussions" style={{textDecoration:"underline"}}>The Engineering Exchange →</a></p>
             {selectedService && <aside className="selected-service"><small>SELECTED SERVICE</small><h2>{selectedService.title}</h2><p>{selectedService.summary}</p></aside>}
             <div className="form-grid">
               <label>
@@ -121,7 +121,7 @@ export default function Contact() {
               </label>
               <label>
                 <span>
-                  Work email <b>*</b>
+                  Email <b>*</b>
                 </span>
                 <input
                   type="email"
@@ -143,7 +143,11 @@ export default function Contact() {
               <label>
                 <span>Area of interest</span>
                 <select name="interest" defaultValue="" ref={interestRef}>
-                  <option value="">Select an area</option>
+                  <option value="">Select a reason</option>
+                  <option>Research or engineering collaboration</option>
+                  <option>General question or technical discussion</option>
+                  <option>Consulting or project inquiry</option>
+                  <option>Product or technical support</option>
                   <option>Industrial controls & automation</option>
                   <option>EPICS integration & modernization</option>
                   <option>Digital twins & simulation</option>
@@ -172,7 +176,7 @@ export default function Contact() {
               </label>
               <label className="form-wide">
                 <span>
-                  How can we help? <b>*</b>
+                  What would you like to discuss? <b>*</b>
                 </span>
                 <textarea ref={messageRef} name="message" rows={6} maxLength={5000} required />
               </label>

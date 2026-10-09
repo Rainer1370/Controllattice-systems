@@ -59,3 +59,9 @@ References: https://developers.cloudflare.com/d1/reference/time-travel/ and http
 ## Current limitations
 
 Google Cloud showed “Site Unavailable” in the available browser. Production browser navigation to controllattice.com was blocked by the browser's client policy; HTTP route checks were possible. Real OAuth, owner verification, mobile visual QA, and actual Contact delivery are release blockers. Keep posting disabled until they are resolved. Automatic exported backups and periodic expired-record cleanup are not scheduled.
+
+## First contribution approval and email alerts
+
+Members can compose replies before sign-in; their draft is retained in session storage in that browser tab through OAuth. Signed-in authors see their pending replies, while other readers cannot. Approving a contribution marks the author trusted; administrators can restore review requirements using Require review. Existing pending contributions still require individual approval.
+
+Configure `RESEND_API_KEY` as a hosted secret, `EXCHANGE_EMAIL_FROM` as a sender verified in Resend, and `EXCHANGE_MODERATION_EMAIL` as the private administrator recipient. New untrusted thread/reply submissions atomically enqueue a generic moderation email in the existing moderation log. The message links to the protected administrator queue and contains no comment body, user email, or approval bearer token. Delivery failures stay queued; new submissions and the administrator Retry queued email alerts control retry delivery with provider idempotency keys. No notification delivery is claimed until these runtime values are configured and actual delivery is tested.

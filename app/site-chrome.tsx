@@ -1,4 +1,4 @@
-type Page = "home" | "products" | "work" | "ai" | "about" | "staff" | "contact" | "observable";
+type Page = "home" | "products" | "work" | "ai" | "about" | "staff" | "contact" | "observable" | "discussions";
 
 function Mark() { return <svg className="mark" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 5 88 27v46L50 95 12 73V27Z"/><path d="M64 29a27 27 0 1 0 0 42M48 26v48l27 15M48 50l40-23"/><circle cx="48" cy="50" r="4"/><circle cx="88" cy="27" r="3"/><circle cx="75" cy="89" r="3"/></svg>; }
 export function Brand() { return <span className="brand"><Mark/><span><strong>CONTROL<i>LATTICE</i></strong><small>SYSTEMS</small></span></span>; }
@@ -11,6 +11,7 @@ const links: { key: Page; label: string; href: string }[] = [
   { key: "ai", label: "AI & Knowledge", href: "/ai" },
   { key: "about", label: "About", href: "/about" },
   { key: "staff", label: "Staff", href: "/staff" },
+  { key: "discussions", label: "Discussions", href: "/discussions" },
   { key: "contact", label: "Contact", href: "/contact" },
 ];
 

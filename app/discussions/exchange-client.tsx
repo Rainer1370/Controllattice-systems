@@ -113,7 +113,11 @@ export default function ExchangeClient({ admin = false }: { admin?: boolean }) {
     setReplies(data.replies);
     setLiked(data.liked);
     setParent(null);
-    setReplyBody("");
+    try {
+      const draft = JSON.parse(sessionStorage.getItem("exchange-reply-draft") || "null");
+      setReplyBody(draft?.thread === id ? draft.body : "");
+      if (draft?.thread === id) setParent(draft.parent || null);
+    } catch { setReplyBody(""); }
     window.history.replaceState(
       null,
       "",
@@ -131,7 +135,9 @@ export default function ExchangeClient({ admin = false }: { admin?: boolean }) {
       try {
         await session();
         if (!admin) {
-          const id = new URLSearchParams(window.location.search).get("thread");
+          let draftThread: string | null = null;
+          try { draftThread = JSON.parse(sessionStorage.getItem("exchange-reply-draft") || "null")?.thread || null; } catch {}
+          const id = new URLSearchParams(window.location.search).get("thread") || draftThread;
           if (id) await open(id);
           await loadFeed(0);
         }
@@ -166,15 +172,25 @@ export default function ExchangeClient({ admin = false }: { admin?: boolean }) {
   }
   async function submitReply(event: FormEvent) {
     event.preventDefault();
+    if (!user) {
+      sessionStorage.setItem("exchange-reply-draft", JSON.stringify({ thread: selected!.id, parent, body: replyBody }));
+      window.location.assign("/api/exchange/auth/start");
+      return;
+    }
+    if (user.display_name === "New member") {
+      setError("Choose a public display name in My public profile and data above, then submit your reply.");
+      return;
+    }
     await action(async () => {
       const data = await api("/threads/" + selected!.id + "/replies", "POST", {
         body: replyBody,
         parent_id: parent,
         website: "",
       });
+      sessionStorage.removeItem("exchange-reply-draft");
       setNotice(
         data.status === "pending"
-          ? "Reply submitted for moderation."
+          ? "Your reply is saved and visible to you. It will become public after approval."
           : "Reply published.",
       );
       await open(selected!.id);
@@ -260,7 +276,7 @@ export default function ExchangeClient({ admin = false }: { admin?: boolean }) {
             <strong>{r.display_name}</strong>
             <span>
               {date(r.created_at)} ·{" "}
-              {r.status === "published" ? "Reply" : r.status}
+              {r.status === "pending" ? "Awaiting approval · visible to you and moderators" : r.status === "published" ? "Reply" : r.status}
             </span>
           </div>
           <p className="exchange-body">{r.body}</p>
@@ -292,8 +308,8 @@ export default function ExchangeClient({ admin = false }: { admin?: boolean }) {
           </strong>
           <p>
             {enabled
-              ? "First contributions are reviewed before publication."
-              : "Public reading is open. Posting awaits final Google sign-in and moderation checks."}
+              ? "Your first contribution is reviewed before publication; you can see it while it is pending."
+              : "Read discussions or write a reply below. Submissions open after administrator setup is verified."}
           </p>
         </div>
         <div className="exchange-inline">
@@ -451,6 +467,8 @@ export default function ExchangeClient({ admin = false }: { admin?: boolean }) {
                     </div>
                   ))}
                 </div>
+                <p>{queue.notifications?.configured ? "Moderation email alerts are configured." : "Moderation email alerts need a sender and API key."} {queue.notifications?.pending || 0} alerts awaiting delivery.</p>
+                <button onClick={() => action(async () => { await api("/admin", "POST", { action: "retry-notifications" }); await moderation(); })}>Retry queued email alerts</button>
                 <h2>Pending contributions</h2>
                 {queue.threads.length + queue.replies.length === 0 && (
                   <p>No contributions are awaiting approval.</p>
@@ -816,7 +834,7 @@ export default function ExchangeClient({ admin = false }: { admin?: boolean }) {
           <form onSubmit={submitReply}>
             <fieldset
               disabled={
-                !canPost ||
+                !!user?.banned ||
                 busy ||
                 !!selected.locked ||
                 selected.status !== "published"
@@ -828,7 +846,10 @@ export default function ExchangeClient({ admin = false }: { admin?: boolean }) {
                   id="reply-content"
                   rows={4}
                   value={replyBody}
-                  onChange={(e) => setReplyBody(e.target.value)}
+                  onChange={(e) => {
+                    setReplyBody(e.target.value);
+                    try { sessionStorage.setItem("exchange-reply-draft", JSON.stringify({ thread: selected.id, parent, body: e.target.value })); } catch {}
+                  }}
                   minLength={10}
                   maxLength={12000}
                   required
@@ -839,12 +860,14 @@ export default function ExchangeClient({ admin = false }: { admin?: boolean }) {
                   Reply to discussion instead
                 </button>
               )}
-              <button className="button">Submit reply</button>
+              <button className="button" disabled={!enabled || (!user && !signIn)}>
+                {user ? "Submit reply" : "Sign in with Google to submit"}
+              </button>
             </fieldset>
             {selected.locked ? (
               <p>This discussion is locked.</p>
             ) : (
-              <p>First contributions require approval.</p>
+              <p>Your first comment is visible to you immediately and becomes public after approval. Once approved, future contributions can appear directly.{!enabled && " You can write a draft now; submissions are paused while administrator and email setup are completed."}</p>
             )}
           </form>
         </section>

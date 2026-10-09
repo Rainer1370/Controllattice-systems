@@ -8,6 +8,9 @@ export interface ExchangeEnv {
   EXCHANGE_POSTING_ENABLED?: string;
   EXCHANGE_RATE_SALT?: string;
   EXCHANGE_SETUP_TOKEN?: string;
+  RESEND_API_KEY?: string;
+  EXCHANGE_EMAIL_FROM?: string;
+  EXCHANGE_MODERATION_EMAIL?: string;
 }
 type Member = {
   id: string;
@@ -441,6 +444,27 @@ async function oauthRoute(request: Request, env: ExchangeEnv, path: string) {
   failure(404, "Route not found.");
 }
 
+export async function deliverModerationNotifications(env: ExchangeEnv) {
+  const db = env.EXCHANGE_DB;
+  if (!db || !env.RESEND_API_KEY || !env.EXCHANGE_EMAIL_FROM || !env.EXCHANGE_MODERATION_EMAIL) return;
+  const queued = await db.prepare("SELECT id,target_type,target_id FROM exchange_moderation_log WHERE action='notification_pending' ORDER BY created_at LIMIT 5").all<{id:string;target_type:string;target_id:string}>();
+  for (const item of queued.results) {
+    try {
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + env.RESEND_API_KEY, "Content-Type": "application/json", "Idempotency-Key": item.id },
+        body: JSON.stringify({ from: env.EXCHANGE_EMAIL_FROM, to: [env.EXCHANGE_MODERATION_EMAIL], subject: "Engineering Exchange: new member contribution awaiting approval", text: "A new member has submitted a " + item.target_type + ". It remains private until you approve it. Review the moderation queue: " + env.EXCHANGE_ORIGIN + "/discussions/admin\nContribution: " + item.target_id }),
+        signal: AbortSignal.timeout(10000),
+      });
+      if (!response.ok) throw new Error("Email delivery failed");
+      await db.prepare("UPDATE exchange_moderation_log SET action='notification_sent' WHERE id=? AND action='notification_pending'").bind(item.id).run();
+    } catch { console.error("Moderation email remains queued for retry"); }
+  }
+}
+function notification(db: D1Database, kind: string, id: string) {
+  return db.prepare("INSERT INTO exchange_moderation_log (id,moderator_id,target_type,target_id,action,reason,created_at) VALUES (?,NULL,?,?,'notification_pending','New member approval requested',?)").bind("notification-" + id, kind, id, now());
+}
+
 export async function exchange(
   request: Request,
   env: ExchangeEnv,
@@ -663,6 +687,10 @@ async function route(request: Request, env: ExchangeEnv): Promise<Response> {
   if (path === "/admin" && request.method === "GET") {
     privileged(user);
     return json({
+      notifications: {
+        configured: !!(env.RESEND_API_KEY && env.EXCHANGE_EMAIL_FROM && env.EXCHANGE_MODERATION_EMAIL),
+        pending: (await db.prepare("SELECT COUNT(*) AS n FROM exchange_moderation_log WHERE action='notification_pending'").first<{n:number}>())?.n || 0,
+      },
       threads: (
         await db
           .prepare(
@@ -703,6 +731,10 @@ async function route(request: Request, env: ExchangeEnv): Promise<Response> {
     csrf(request, actor, env);
     await limited(db, `admin:${actor.id}`, 60, 600);
     const data = await input(request);
+    if (data.action === "retry-notifications") {
+      await deliverModerationNotifications(env);
+      return json({ ok: true });
+    }
     if (data.action === "seed") {
       if (actor.role !== "admin") failure(403, "Administrator required.");
       await seed(db);
@@ -794,6 +826,7 @@ async function route(request: Request, env: ExchangeEnv): Promise<Response> {
     else failure(400, "Unsupported moderation action.");
     await db.batch([
       stmt,
+      ...(action === "publish" ? [db.prepare(`UPDATE exchange_users SET trusted=1 WHERE id=(SELECT author_id FROM ${table(kind)} WHERE id=?) AND banned=0 AND deleted_at IS NULL`).bind(id)] : []),
       db
         .prepare(
           "INSERT INTO exchange_moderation_log (id,moderator_id,target_type,target_id,action,reason,created_at) VALUES (?,?,?,?,?,?,?)",
@@ -824,12 +857,12 @@ async function route(request: Request, env: ExchangeEnv): Promise<Response> {
         ? "published"
         : "pending";
     await limited(db, `thread:${actor.id}`, 3, 3600);
-    await db
+    const insertion = db
       .prepare(
         "INSERT INTO exchange_threads (id,topic_id,author_id,title,body,status,pinned,locked,starter,created_at,updated_at) VALUES (?,?,?,?,?,?,0,0,0,?,?)",
       )
-      .bind(id, topic, actor.id, title, body, status, now(), now())
-      .run();
+      .bind(id, topic, actor.id, title, body, status, now(), now());
+    await db.batch([insertion, ...(status === "pending" ? [notification(db, "thread", id)] : [])]);
     return json({ id, status }, 201);
   }
   const reply = path.match(/^\/threads\/([a-zA-Z0-9_-]+)\/replies$/);
@@ -875,7 +908,7 @@ async function route(request: Request, env: ExchangeEnv): Promise<Response> {
         actor.trusted || ["admin", "moderator"].includes(actor.role)
           ? "published"
           : "pending";
-    await db
+    const insertion = db
       .prepare(
         "INSERT INTO exchange_replies (id,thread_id,parent_id,author_id,body,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)",
       )
@@ -888,8 +921,8 @@ async function route(request: Request, env: ExchangeEnv): Promise<Response> {
         status,
         now(),
         now(),
-      )
-      .run();
+      );
+    await db.batch([insertion, ...(status === "pending" ? [notification(db, "reply", id)] : [])]);
     return json({ id, status }, 201);
   }
   const react = path.match(/^\/threads\/([a-zA-Z0-9_-]+)\/reaction$/);

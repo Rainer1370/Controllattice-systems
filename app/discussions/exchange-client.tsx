@@ -114,13 +114,15 @@ export default function ExchangeClient({ admin = false }: { admin?: boolean }) {
     setLiked(data.liked);
     setParent(null);
     setReplyBody("");
-    requestAnimationFrame(() => document.getElementById("selected-discussion")?.scrollIntoView({ block: "start" }));
     window.history.replaceState(
       null,
       "",
       "/discussions?thread=" + encodeURIComponent(id),
     );
   }
+  useEffect(() => {
+    if (selected) document.getElementById("selected-discussion")?.scrollIntoView({ block: "start" });
+  }, [selected]);
   async function moderation() {
     setQueue(await api("/admin"));
   }
@@ -623,7 +625,16 @@ export default function ExchangeClient({ admin = false }: { admin?: boolean }) {
           )}
           <div className="exchange-feed">
             {threads.map((t) => (
-              <article className="exchange-panel" key={t.id}>
+              <a
+                className="exchange-panel exchange-card"
+                key={t.id}
+                href={"/discussions?thread=" + encodeURIComponent(t.id)}
+                onClick={(event) => {
+                  if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+                  event.preventDefault();
+                  action(() => open(t.id));
+                }}
+              >
                 <div className="exchange-meta">
                   <span>
                     {labels[t.topic_id]}
@@ -637,12 +648,7 @@ export default function ExchangeClient({ admin = false }: { admin?: boolean }) {
                   </span>
                 </div>
                 <h3>
-                  <button
-                    className="exchange-title"
-                    onClick={() => action(() => open(t.id))}
-                  >
-                    {t.title}
-                  </button>
+                  <span className="exchange-title">{t.title}</span>
                 </h3>
                 <p>
                   {t.body.slice(0, 220)}
@@ -654,7 +660,7 @@ export default function ExchangeClient({ admin = false }: { admin?: boolean }) {
                     {t.reply_count} replies · {t.reactions} appreciations
                   </span>
                 </div>
-              </article>
+              </a>
             ))}
           </div>
           <div className="exchange-inline">

@@ -226,6 +226,12 @@ test("new-member thread approval and real persistent storage", async () => {
   );
 });
 test("trusted replies, threaded replies, pending visibility and invalid parents", async () => {
+  assert.equal((await db.prepare("SELECT trusted FROM exchange_users WHERE id='alice'").first()).trusted, 1);
+  const direct = await result("/threads/detection-is-not-diagnosis/replies", {user:"alice", method:"POST", data:{body:"My first contribution was approved, so this reply is public."}});
+  assert.equal(direct.data.status, "published");
+  // Administrators can require review again for an established member.
+  await result("/admin", {user:"admin", method:"POST", data:{kind:"user",id:"alice",action:"untrust"}});
+
   const reply = await result("/threads/" + aliceThread + "/replies", {
     user: "bob",
     method: "POST",
@@ -243,6 +249,9 @@ test("trusted replies, threaded replies, pending visibility and invalid parents"
   });
   assert.equal(nested.data.status, "pending");
   child = nested.data.id;
+  assert.ok((await result("/threads/" + aliceThread, {user:"alice"})).data.replies.some(r => r.id === child && r.status === "pending"));
+  const pendingAlert = await db.prepare("SELECT action FROM exchange_moderation_log WHERE target_id=? AND action='notification_pending'").bind(child).first();
+  assert.ok(pendingAlert);
   assert.equal(
     (await result("/threads/" + aliceThread)).data.replies.length,
     1,
@@ -533,4 +542,30 @@ test('OAuth state, PKCE, verified account creation, cookie flags and replay', as
     assert.equal(user.role,'admin');assert.equal(user.display_name,'New member');
     assert.equal((await exchange(new Request(callback,{headers:{cookie:'__Host-exchange-oauth='+state}}),oauthEnv)).status,401);
   } finally {globalThis.fetch=original;}
+});
+
+test("moderation email failures remain queued and retries use idempotency", async () => {
+  const {deliverModerationNotifications} = await import("../.test-build/exchange.mjs");
+  const queuedBefore = await db.prepare("SELECT COUNT(*) AS n FROM exchange_moderation_log WHERE action='notification_pending'").first();
+  assert.ok(queuedBefore.n > 0);
+  const previous = globalThis.fetch;
+  const mailEnv = {...env,RESEND_API_KEY:"test-only",EXCHANGE_EMAIL_FROM:"Exchange <test@example.com>",EXCHANGE_MODERATION_EMAIL:"admin@example.com"};
+  try {
+    globalThis.fetch = async () => new Response("unavailable", {status:503});
+    await deliverModerationNotifications(mailEnv);
+    assert.equal((await db.prepare("SELECT COUNT(*) AS n FROM exchange_moderation_log WHERE action='notification_pending'").first()).n, queuedBefore.n);
+    let sent = 0;
+    globalThis.fetch = async (url, options) => {
+      assert.equal(url,"https://api.resend.com/emails");
+      assert.ok(options.headers["Idempotency-Key"].startsWith("notification-"));
+      const body=JSON.parse(options.body);
+      assert.deepEqual(body.to,["admin@example.com"]);
+      assert.match(body.text,/discussions\/admin/);
+      assert.equal(Object.hasOwn(body,"html"),false);
+      sent++; return new Response('{"id":"test"}',{status:200});
+    };
+    await deliverModerationNotifications(mailEnv);
+    assert.equal(sent, Math.min(5,queuedBefore.n));
+    assert.equal((await db.prepare("SELECT COUNT(*) AS n FROM exchange_moderation_log WHERE action='notification_pending'").first()).n,queuedBefore.n-sent);
+  } finally { globalThis.fetch=previous; }
 });

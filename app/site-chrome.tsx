@@ -1,4 +1,5 @@
 type Page =
+  | "learn"
   | "home"
   | "products"
   | "work"
@@ -37,6 +38,7 @@ export function Brand() {
 
 const links: { key: Page; label: string; href: string }[] = [
   { key: "home", label: "Home", href: "/" },
+  { key: "learn", label: "Learning Lab", href: "/learn" },
   { key: "products", label: "Services & Products", href: "/products" },
   {
     key: "observable",

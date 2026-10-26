@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const paths = ["", "/observable-machine", "/products", "/work", "/ai", "/about", "/staff", "/contact"];
+  const paths = ["", "/observable-machine", "/products", "/publications", "/work", "/service-desk-demo/", "/ai", "/outreach", "/about", "/staff", "/contact"];
   return paths.map((path) => ({
     url: `https://controllattice.com${path}`,
     lastModified: new Date(),

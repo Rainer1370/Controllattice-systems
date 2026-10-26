@@ -1172,3 +1172,6 @@ footer p span {
 @utility scrollbar-gutter-stable { scrollbar-gutter: stable; }
 
 .exchange-card{display:block;color:inherit;text-decoration:none;cursor:pointer;scroll-margin-top:24px}.exchange-card:hover{border-color:#75b6b3}.exchange-card:hover .exchange-title{text-decoration:underline}.exchange-detail{scroll-margin-top:24px}
+
+/* Quote labels replace numeric prices on scoped engineering offers. */
+.price-panel > .quote-label, .review-offer > .quote-label { font-size: clamp(28px, 3vw, 36px); letter-spacing: -.025em; line-height: 1.15; overflow-wrap: normal; }

@@ -1175,3 +1175,7 @@ footer p span {
 
 /* Quote labels replace numeric prices on scoped engineering offers. */
 .price-panel > .quote-label, .review-offer > .quote-label { font-size: clamp(28px, 3vw, 36px); letter-spacing: -.025em; line-height: 1.15; overflow-wrap: normal; }
+
+/* Homepage hero without portrait (Nov 18, 2026): single-column copy over the facility backdrop. */
+.science-hero-grid.no-person{grid-template-columns:1fr;align-items:center;min-height:520px}
+.science-hero-grid.no-person .hero-copy{padding:96px 0 80px}

@@ -23,8 +23,7 @@ const industries = [
 
 export default function Home() { return <main className="science-theme">
   <SiteHeader active="home" />
-  <section className="science-hero"><div className="science-hero-bg"/><div className="shell science-hero-grid">
-    <aside className="hero-person"><img src="/brand/rob-rainer-2026.jpg" alt="Rob Rainer in a scientific controls environment"/><div className="person-label"><strong>ROB RAINER</strong><span>Managing Director &amp; Principal Engineer</span></div></aside>
+  <section className="science-hero"><div className="science-hero-bg"/><div className="shell science-hero-grid no-person">
     <div className="hero-copy"><p className="eyebrow"><i/> Engineering · Intelligence · Creation</p><h1>Making complex systems—and complex knowledge—work better.</h1><p className="lede">We build reliable engineering systems, train and apply AI, develop technical products, and publish practical knowledge.</p><div className="actions"><a className="button" href="/products">Explore our work →</a><a className="button ghost" href="/contact">Work with us →</a></div><div className="signal"><span>ENGINEERING</span><b/><span>AI</span><b/><span>PRODUCTS</span><b/><span>RESEARCH</span></div></div>
   </div></section>
   <section className="capability-strip"><div className="shell capability-grid">{capabilities.map(c=><article key={c[0]}><b>{c[0]}</b><div><h3>{c[1]}</h3><p>{c[2]}</p></div></article>)}</div></section>
